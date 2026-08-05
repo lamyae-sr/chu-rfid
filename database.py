@@ -7,19 +7,23 @@ from config import HOST, USER, PASSWORD, DATABASE, PORT
 # =====================================================
 
 def connecter():
-
+    
     try:
 
-     connexion = mysql.connector.connect(
-       host=HOST,
-       user=USER,
-       password=PASSWORD,
-       database=DATABASE,
-       port=PORT,
-       connection_timeout=5
-           )
+        print("Connexion à MySQL...")
 
-     return connexion
+        connexion = mysql.connector.connect(
+            host=HOST,
+            user=USER,
+            password=PASSWORD,
+            database=DATABASE,
+            port=PORT,
+            connection_timeout=5
+        )
+
+        print("Connexion MySQL réussie !")
+
+        return connexion
 
     except mysql.connector.Error as erreur:
 
