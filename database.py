@@ -10,15 +10,16 @@ def connecter():
 
     try:
 
-        connexion = mysql.connector.connect(
-            host=HOST,
-            user=USER,
-            password=PASSWORD,
-            database=DATABASE,
-            port=PORT
-        )
+     connexion = mysql.connector.connect(
+       host=HOST,
+       user=USER,
+       password=PASSWORD,
+       database=DATABASE,
+       port=PORT,
+       connection_timeout=5
+           )
 
-        return connexion
+     return connexion
 
     except mysql.connector.Error as erreur:
 
