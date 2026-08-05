@@ -223,6 +223,29 @@ def test():
 # API RFID
 # =====================================================
 
+# =====================================================
+# TEST BASE DE DONNEES
+# =====================================================
+
+@app.route("/testdb")
+def testdb():
+
+    try:
+        utilisateur = chercher_carte("01 02 03 04")
+
+        return jsonify({
+            "status": "OK",
+            "message": "Connexion MySQL réussie",
+            "test": utilisateur
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "status": "ERREUR",
+            "message": str(e)
+        }), 500
+
 @app.route("/api/rfid", methods=["POST"])
 def api_rfid():
 
@@ -282,10 +305,12 @@ def api_rfid():
 # LANCEMENT
 # =====================================================
 
+import os
+
 if __name__ == "__main__":
 
     app.run(
         host="0.0.0.0",
-        port=5000,
-        debug=True
+        port=int(os.environ.get("PORT", 5000)),
+        debug=False
     )
