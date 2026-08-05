@@ -1,10 +1,10 @@
 import mysql.connector
-from config import HOST, USER, PASSWORD, DATABASE, PORT
+from datetime import datetime
+from config import HOST, USER, PASSWORD, DATABASE, MYSQL_PORT
 
-
-# ==========================================
-# Connexion à MySQL
-# ==========================================
+# =====================================================
+# CONNEXION MYSQL
+# =====================================================
 
 def connecter():
 
@@ -15,65 +15,127 @@ def connecter():
             user=USER,
             password=PASSWORD,
             database=DATABASE,
-            port=PORT
+            port=MYSQL_PORT
         )
 
         return connexion
 
     except mysql.connector.Error as erreur:
 
-        print("Erreur :", erreur)
+        print("Erreur MySQL :", erreur)
 
         return None
 
 
-# ==========================================
-# Afficher tous les utilisateurs
-# ==========================================
+# =====================================================
+# AFFICHER TOUS LES UTILISATEURS
+# =====================================================
 
 def afficher_utilisateurs():
 
     connexion = connecter()
 
+    if connexion is None:
+        return []
+
     curseur = connexion.cursor(dictionary=True)
 
-    requete = "SELECT * FROM users ORDER BY nom"
+    curseur.execute("SELECT * FROM users ORDER BY nom")
 
-    curseur.execute(requete)
-
-    utilisateurs = curseur.fetchall()
+    resultat = curseur.fetchall()
 
     curseur.close()
     connexion.close()
 
-    return utilisateurs
+    return resultat
 
 
-# ==========================================
-# Chercher une carte RFID
-# ==========================================
+# =====================================================
+# CHERCHER UTILISATEUR PAR ID
+# =====================================================
+
+def chercher_utilisateur(id):
+
+    connexion = connecter()
+
+    if connexion is None:
+        return None
+
+    curseur = connexion.cursor(dictionary=True)
+
+    curseur.execute(
+        "SELECT * FROM users WHERE id=%s",
+        (id,)
+    )
+
+    resultat = curseur.fetchone()
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
+
+# =====================================================
+# CHERCHER PAR UID RFID
+# =====================================================
 
 def chercher_carte(uid):
 
     connexion = connecter()
 
+    if connexion is None:
+        return None
+
+    uid = uid.strip().upper()
+
     curseur = connexion.cursor(dictionary=True)
 
-    sql = "SELECT * FROM users WHERE uid=%s"
+    sql = """
+    SELECT *
+    FROM users
+    WHERE UPPER(TRIM(uid))=%s
+    """
 
     curseur.execute(sql, (uid,))
 
-    utilisateur = curseur.fetchone()
+    resultat = curseur.fetchone()
 
     curseur.close()
     connexion.close()
 
-    return utilisateur
+    return resultat
 
 
-# ==========================================
-# Ajouter un utilisateur
-# ==========================================
+# =====================================================
+# CHERCHER ADMIN
+# =====================================================
+
+def chercher_admin(username):
+
+    connexion = connecter()
+
+    if connexion is None:
+        return None
+
+    curseur = connexion.cursor(dictionary=True)
+
+    curseur.execute(
+        "SELECT * FROM admins WHERE username=%s",
+        (username,)
+    )
+
+    resultat = curseur.fetchone()
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
+
+# =====================================================
+# AJOUTER UTILISATEUR
+# =====================================================
 
 def ajouter_utilisateur(uid,
                          nom,
@@ -85,16 +147,30 @@ def ajouter_utilisateur(uid,
 
     connexion = connecter()
 
+    if connexion is None:
+        return
+
     curseur = connexion.cursor()
 
     sql = """
     INSERT INTO users
-    (uid, nom, service, fonction, email, telephone, actif)
-    VALUES (%s,%s,%s,%s,%s,%s,%s)
+    (
+        uid,
+        nom,
+        service,
+        fonction,
+        email,
+        telephone,
+        actif
+    )
+    VALUES
+    (
+        %s,%s,%s,%s,%s,%s,%s
+    )
     """
 
     valeurs = (
-        uid,
+        uid.strip().upper(),
         nom,
         service,
         fonction,
@@ -108,13 +184,12 @@ def ajouter_utilisateur(uid,
     connexion.commit()
 
     curseur.close()
-
     connexion.close()
 
 
-# ==========================================
-# Modifier un utilisateur
-# ==========================================
+# =====================================================
+# MODIFIER
+# =====================================================
 
 def modifier_utilisateur(id,
                           uid,
@@ -126,6 +201,9 @@ def modifier_utilisateur(id,
                           actif):
 
     connexion = connecter()
+
+    if connexion is None:
+        return
 
     curseur = connexion.cursor()
 
@@ -143,7 +221,7 @@ def modifier_utilisateur(id,
     """
 
     valeurs = (
-        uid,
+        uid.strip().upper(),
         nom,
         service,
         fonction,
@@ -158,91 +236,78 @@ def modifier_utilisateur(id,
     connexion.commit()
 
     curseur.close()
-
     connexion.close()
 
 
-# ==========================================
-# Supprimer un utilisateur
-# ==========================================
+# =====================================================
+# SUPPRIMER
+# =====================================================
 
 def supprimer_utilisateur(id):
 
     connexion = connecter()
 
+    if connexion is None:
+        return
+
     curseur = connexion.cursor()
 
-    sql = "DELETE FROM users WHERE id=%s"
-
-    curseur.execute(sql, (id,))
+    curseur.execute(
+        "DELETE FROM users WHERE id=%s",
+        (id,)
+    )
 
     connexion.commit()
 
     curseur.close()
-
     connexion.close()
 
 
-# ==========================================
-# Chercher un utilisateur par ID
-# ==========================================
+# =====================================================
+# ENREGISTRER ACCES
+# =====================================================
 
-def chercher_utilisateur(id):
-
-    connexion = connecter()
-
-    curseur = connexion.cursor(dictionary=True)
-
-    sql = "SELECT * FROM users WHERE id=%s"
-
-    curseur.execute(sql, (id,))
-
-    utilisateur = curseur.fetchone()
-
-    curseur.close()
-
-    connexion.close()
-
-    return utilisateur
-
-
-def chercher_admin(username):
+def enregistrer_acces(uid,
+                       nom,
+                       resultat):
 
     connexion = connecter()
 
-    curseur = connexion.cursor(dictionary=True)
-
-    sql = "SELECT * FROM admins WHERE username=%s"
-
-    curseur.execute(sql, (username,))
-
-    admin = curseur.fetchone()
-
-    curseur.close()
-
-    connexion.close()
-
-    return admin
-
-from datetime import datetime
-
-def enregistrer_acces(uid, nom, resultat):
-
-    connexion = connecter()
+    if connexion is None:
+        return
 
     curseur = connexion.cursor()
 
     maintenant = datetime.now()
 
     date = maintenant.date()
+
     heure = maintenant.strftime("%H:%M:%S")
 
     sql = """
-    INSERT INTO logs(uid, nom, date_acces, heure_acces, resultat)
-    VALUES (%s,%s,%s,%s,%s)
+    INSERT INTO logs
+    (
+        uid,
+        nom,
+        date_acces,
+        heure_acces,
+        resultat
+    )
+    VALUES
+    (
+        %s,%s,%s,%s,%s
+    )
     """
 
-    curseur.execute(sql, (uid, nom, date, heure, resultat))
+    valeurs = (
+        uid,
+        nom,
+        date,
+        heure,
+        resultat
+    )
+
+    curseur.execute(sql, valeurs)
 
     connexion.commit()
 
