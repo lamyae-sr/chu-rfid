@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash
 
 from database import (
     afficher_utilisateurs,
+    afficher_historique,
     ajouter_utilisateur,
     modifier_utilisateur,
     supprimer_utilisateur,
@@ -109,7 +110,12 @@ def historique():
     if "admin" not in session:
         return redirect(url_for("login"))
 
-    return render_template("historique.html")
+    historique = afficher_historique()
+
+    return render_template(
+        "historique.html",
+        historique=historique
+    )
 
 
 # =====================================================

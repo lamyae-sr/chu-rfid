@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 
 <head>
@@ -8,15 +7,133 @@
 
 <title>Historique</title>
 
+<style>
+
+body{
+
+    font-family:Arial;
+    background:#f4f6f8;
+    margin:40px;
+
+}
+
+h1{
+
+    color:#0b5aa2;
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+
+}
+
+th{
+
+    background:#0b5aa2;
+    color:white;
+    padding:12px;
+
+}
+
+td{
+
+    padding:10px;
+    border-bottom:1px solid #ddd;
+    text-align:center;
+
+}
+
+tr:nth-child(even){
+
+    background:#f2f2f2;
+
+}
+
+.autorise{
+
+    color:green;
+    font-weight:bold;
+
+}
+
+.refuse{
+
+    color:red;
+    font-weight:bold;
+
+}
+
+a{
+
+    display:inline-block;
+    margin-top:20px;
+    background:#0b5aa2;
+    color:white;
+    padding:10px 20px;
+    text-decoration:none;
+    border-radius:6px;
+
+}
+
+</style>
+
 </head>
 
 <body>
 
-<h1>Historique des accès</h1>
+<h1>Historique des accès RFID</h1>
 
-<hr>
+<table>
 
-<p>Cette page affichera prochainement tous les accès RFID.</p>
+<tr>
+
+<th>UID</th>
+
+<th>Nom</th>
+
+<th>Date</th>
+
+<th>Heure</th>
+
+<th>Résultat</th>
+
+</tr>
+
+{% for ligne in historique %}
+
+<tr>
+
+<td>{{ ligne.uid }}</td>
+
+<td>{{ ligne.nom }}</td>
+
+<td>{{ ligne.date_acces }}</td>
+
+<td>{{ ligne.heure_acces }}</td>
+
+<td>
+
+{% if ligne.resultat=="AUTORISE" %}
+
+<span class="autorise">AUTORISE</span>
+
+{% else %}
+
+<span class="refuse">REFUSE</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
 
 <br>
 

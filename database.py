@@ -419,6 +419,32 @@ def nombre_autorises():
 
     return resultat
 
+# =====================================================
+# AFFICHER HISTORIQUE
+# =====================================================
+
+def afficher_historique():
+
+    connexion = connecter()
+
+    if connexion is None:
+        return []
+
+    curseur = connexion.cursor(dictionary=True)
+
+    curseur.execute("""
+        SELECT *
+        FROM logs
+        ORDER BY id DESC
+    """)
+
+    resultat = curseur.fetchall()
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
 
 def nombre_refuses():
 
