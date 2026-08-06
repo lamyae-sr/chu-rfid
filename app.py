@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from werkzeug.security import check_password_hash
+from openpyxl import Workbook
+from flask import send_file
+import io
 
 from database import (
     afficher_utilisateurs,
@@ -11,6 +14,7 @@ from database import (
     chercher_admin,
     chercher_carte,
     enregistrer_acces,
+    exporter_logs,
 
     nombre_utilisateurs,
     nombre_cartes_actives,
@@ -128,7 +132,42 @@ def export():
     if "admin" not in session:
         return redirect(url_for("login"))
 
-    return "<h2>Export Excel à développer</h2>"
+    logs = exporter_logs()
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Historique RFID"
+
+    ws.append([
+        "UID",
+        "Nom",
+        "Date",
+        "Heure",
+        "Résultat"
+    ])
+
+    for log in logs:
+
+        ws.append([
+            log["uid"],
+            log["nom"],
+            str(log["date_acces"]),
+            log["heure_acces"],
+            log["resultat"]
+        ])
+
+    fichier = io.BytesIO()
+
+    wb.save(fichier)
+
+    fichier.seek(0)
+
+    return send_file(
+        fichier,
+        download_name="Historique_RFID.xlsx",
+        as_attachment=True,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 
 # =====================================================
