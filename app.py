@@ -9,9 +9,15 @@ from database import (
     chercher_utilisateur,
     chercher_admin,
     chercher_carte,
-    enregistrer_acces
-)
+    enregistrer_acces,
 
+    nombre_utilisateurs,
+    nombre_cartes_actives,
+    nombre_cartes_inactives,
+    nombre_acces,
+    nombre_autorises,
+    nombre_refuses
+)
 app = Flask(__name__)
 app.secret_key = "chu_rfid_2026"
 
@@ -76,14 +82,21 @@ def ping():
     return jsonify({
         "message": "pong"
     })
-
 @app.route("/dashboard")
 def dashboard():
 
     if "admin" not in session:
         return redirect(url_for("login"))
 
-    return render_template("dashboard.html")
+    return render_template(
+        "dashboard.html",
+        utilisateurs=nombre_utilisateurs(),
+        actives=nombre_cartes_actives(),
+        inactives=nombre_cartes_inactives(),
+        acces=nombre_acces(),
+        autorises=nombre_autorises(),
+        refuses=nombre_refuses()
+    )
 
 
 # =====================================================

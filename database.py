@@ -318,3 +318,124 @@ def enregistrer_acces(uid,
 
     curseur.close()
     connexion.close()
+
+    # =====================================================
+# STATISTIQUES DASHBOARD
+# =====================================================
+
+def nombre_utilisateurs():
+
+    connexion = connecter()
+
+    if connexion is None:
+        return 0
+
+    curseur = connexion.cursor()
+
+    curseur.execute("SELECT COUNT(*) FROM users")
+
+    resultat = curseur.fetchone()[0]
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
+
+def nombre_cartes_actives():
+
+    connexion = connecter()
+
+    if connexion is None:
+        return 0
+
+    curseur = connexion.cursor()
+
+    curseur.execute("SELECT COUNT(*) FROM users WHERE actif=1")
+
+    resultat = curseur.fetchone()[0]
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
+
+def nombre_cartes_inactives():
+
+    connexion = connecter()
+
+    if connexion is None:
+        return 0
+
+    curseur = connexion.cursor()
+
+    curseur.execute("SELECT COUNT(*) FROM users WHERE actif=0")
+
+    resultat = curseur.fetchone()[0]
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
+
+def nombre_acces():
+
+    connexion = connecter()
+
+    if connexion is None:
+        return 0
+
+    curseur = connexion.cursor()
+
+    curseur.execute("SELECT COUNT(*) FROM logs")
+
+    resultat = curseur.fetchone()[0]
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
+
+def nombre_autorises():
+
+    connexion = connecter()
+
+    if connexion is None:
+        return 0
+
+    curseur = connexion.cursor()
+
+    curseur.execute(
+        "SELECT COUNT(*) FROM logs WHERE resultat='AUTORISE'"
+    )
+
+    resultat = curseur.fetchone()[0]
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
+
+
+def nombre_refuses():
+
+    connexion = connecter()
+
+    if connexion is None:
+        return 0
+
+    curseur = connexion.cursor()
+
+    curseur.execute(
+        "SELECT COUNT(*) FROM logs WHERE resultat='REFUSE'"
+    )
+
+    resultat = curseur.fetchone()[0]
+
+    curseur.close()
+    connexion.close()
+
+    return resultat
